@@ -1,0 +1,49 @@
+{% extends "arena/base.html" %}
+{% block title %}AutoChess – Dashboard{% endblock %}
+
+{% block content %}
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-semibold">AutoChess</h1>
+      <div class="text-sm text-slate-700">Két gép egymás ellen, élő megjelenítéssel (Django + HTMX).</div>
+    </div></div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="rounded-2xl card p-5 shadow">
+      <h2 class="text-lg font-semibold mb-4">Új meccs</h2>
+      <div id="new-game-form">
+        {% include "arena/fragments/new_game_form.html" %}
+      </div>
+    </div>
+
+    <div class="rounded-2xl card p-5 shadow flex flex-col max-h-[calc(100vh-210px)]">
+      <h2 class="text-lg font-semibold mb-3 shrink-0">Legutóbbi eredmények</h2>
+      <div class="overflow-auto grow">
+        <table class="w-full text-sm">
+          <thead class="text-slate-600 sticky top-0 bg-white/80 backdrop-blur">
+            <tr>
+              <th class="text-left py-2">ID</th>
+              <th class="text-left py-2">Eredmény</th>
+              <th class="text-left py-2">Ok</th>
+              <th class="text-left py-2">Plies</th>
+              <th class="text-left py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for g in recent %}
+              <tr class="border-t border-slate-200">
+                <td class="py-2">{{ g.id }}</td>
+                <td class="py-2">{{ g.result }}</td>
+                <td class="py-2">{{ g.termination_reason }}</td>
+                <td class="py-2">{{ g.ply_count }}</td>
+                <td class="py-2"><a class="underline" href="{% url 'arena:game' game_id=g.id %}">Megnyitás</a></td>
+              </tr>
+            {% empty %}
+              <tr><td class="py-2 text-slate-600" colspan="5">Még nincs lezárt meccs.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

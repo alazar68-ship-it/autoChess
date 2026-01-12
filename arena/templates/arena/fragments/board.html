@@ -1,0 +1,43 @@
+{% comment %}
+Tábla kirajzolás:
+- A bábuk és a mezők a python-chess `chess.svg` modul által generált SVG-ben vannak.
+- A koordináták (a–h, 1–8) a saját keretünkben jelennek meg (bal + alul).
+{% endcomment %}
+
+<div class="board-wrap">
+  <div class="board-frame">
+    {# Bal oldali rank koordináták (8→1) #}
+    {% for r in "87654321"|make_list %}
+      <div class="coord" style="grid-column: 1; grid-row: {{ forloop.counter }};">{{ r }}</div>
+    {% endfor %}
+
+    {# A tábla (8x8 terület) SVG-ben #}
+    <div class="board-svg" style="grid-column: 2 / span 8; grid-row: 1 / span 8;">
+      {{ board_svg|safe }}
+
+      {# Átlátszó kattintható réteg a mezők fölött (játékos mód) #}
+      <div class="board-overlay {% if not player_can_move %}pointer-events-none{% endif %}">
+        {% for r in "87654321"|make_list %}
+          {% for f in "abcdefgh"|make_list %}
+            {% with sq=f|add:r %}
+              <button
+                type="button"
+                data-square="{{ sq }}" class="sq-hit {% if sq == game.ui_selected_from or sq == game.ui_selected_to %}sq-selected{% endif %}"
+                hx-post="{% url 'arena:click_square' game_id=game.id %}"
+                hx-vals='{"square":"{{ sq }}"}'
+                hx-swap="none"
+                aria-label="Mező {{ sq }}"
+              ></button>
+            {% endwith %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Alsó file koordináták (a→h). Bal alsó sarok üres cella. #}
+    <div class="coord" style="grid-column: 1; grid-row: 9;"></div>
+    {% for f in "abcdefgh"|make_list %}
+      <div class="coord" style="grid-row: 9; grid-column: {{ forloop.counter|add:1 }};">{{ f }}</div>
+    {% endfor %}
+  </div>
+</div>
