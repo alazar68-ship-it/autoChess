@@ -18,12 +18,6 @@ class ArenaConfig(AppConfig):
             if settings.DATABASES.get("default", {}).get("ENGINE") != "django.db.backends.sqlite3":
                 return
 
-            from django.db import connection
-            with connection.cursor() as c:
-                c.execute("PRAGMA journal_mode=WAL;")
-                c.execute("PRAGMA synchronous=NORMAL;")
-                # milliseconds
-                c.execute("PRAGMA busy_timeout=20000;")
         except Exception:
             # If the DB isn't ready yet (e.g., first migrate), ignore.
             return

@@ -83,6 +83,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -92,3 +93,7 @@ AUTOCHESS_DEFAULT_MOVETIME_MS = int(_env("AUTOCHESS_DEFAULT_MOVETIME_MS", "150")
 AUTOCHESS_MAX_PLIES = int(_env("AUTOCHESS_MAX_PLIES", "600") or "600")
 AUTOCHESS_PREVIEW_MS = int(os.getenv('AUTOCHESS_PREVIEW_MS', '350'))
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://lazarsoft.hu",
+    "https://www.lazarsoft.hu",
+]
