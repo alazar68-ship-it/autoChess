@@ -15,7 +15,7 @@ def _env_bool(key: str, default: bool = False) -> bool:
         return default
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
-DEBUG = _env_bool("DJANGO_DEBUG", True)
+DEBUG = _env_bool("DJANGO_DEBUG", False)
 
 SECRET_KEY = _env("DJANGO_SECRET_KEY", "dev-(KG)@cEA#HbQGTAAP+(ph2aljdU53Yp8rWLZfv&i6$fn")  # For dev; override in prod.
 ALLOWED_HOSTS = [h.strip() for h in (_env("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost") or "").split(",") if h.strip()]
@@ -93,7 +93,28 @@ AUTOCHESS_DEFAULT_MOVETIME_MS = int(_env("AUTOCHESS_DEFAULT_MOVETIME_MS", "150")
 AUTOCHESS_MAX_PLIES = int(_env("AUTOCHESS_MAX_PLIES", "600") or "600")
 AUTOCHESS_PREVIEW_MS = int(os.getenv('AUTOCHESS_PREVIEW_MS', '350'))
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://lazarsoft.hu",
-    "https://www.lazarsoft.hu",
-]
+_csrf = _env("DJANGO_CSRF_TRUSTED_ORIGINS", "")
+if _csrf:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf.split(",") if o.strip()]
+else:
+    # Safe defaults for your domains (add subdomain!)
+    CSRF_TRUSTED_ORIGINS = [
+        "https://autochess.lazarsoft.hu",
+        "https://lazarsoft.hu",
+        "https://www.lazarsoft.hu",
+    ]
+
+# Reverse proxy (nginx) behind SSL termination
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # HSTS (careful with includeSubDomains)
+    SECURE_HSTS_SECONDS = int(_env("DJANGO_SECURE_HSTS_SECONDS", "31536000") or "31536000")
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", False)
+    SECURE_HSTS_PRELOAD = _env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
